@@ -9,6 +9,7 @@ import CssBaseline from "@material-ui/core/CssBaseline/CssBaseline";
 import Container from "@material-ui/core/Container";
 import Question from "./Question";
 import Result from "./Result";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles({
     root: {
@@ -35,6 +36,7 @@ export default function Quiz() {
     const classes = useStyles();
     const difficulty = useParams().difficulty || 'easy';
 
+    const [timeLeft, setTimeLeft] = useState(15);
     const [questions, setQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState(0);
 
@@ -43,7 +45,9 @@ export default function Quiz() {
         return choices.map((a) => ({sort: Math.random(), value: a}))
             .sort((a, b) => a.sort - b.sort)
             .map((a) => a.value)
+
     }
+
 
     useEffect(() => {
         fetch(`https://opentdb.com/api.php?amount=10&category=18&difficulty=${difficulty}`)
@@ -63,14 +67,12 @@ export default function Quiz() {
                                     }
                                 });
                                 setQuestions(results);
+                                setTimeLeft(15);
                             }
                         })
                 }
             })
     }, []);
-
-
-    const [timeLeft, setTimeLeft] = useState(15);
 
     useEffect(() => {
         if (!timeLeft) {
@@ -111,6 +113,9 @@ export default function Quiz() {
                 <Card className={classes.root}>
                     <CardActionArea>
                         <CardContent align="center">
+                            {!questions.length && <Typography gutterBottom variant="h5" component="h2">
+                                Loading Quiz....
+                            </Typography>}
                             {currentQuestion < questions.length && <div style={{textAlign: 'center'}}>
                                 <div style={{fontSize: '50px'}}>
                                     <span>00</span>:<span>{timeLeft.toLocaleString('en-US', {
